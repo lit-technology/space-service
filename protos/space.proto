@@ -1,0 +1,260 @@
+syntax = "proto3";
+
+package spark;
+
+message HomeRequest {
+
+}
+
+message HomeResponse {
+	repeated Post posts = 1;
+}
+
+message LatLng {
+	double lat = 1;
+	double lng = 2;
+}
+
+message LatLngBounds {
+	LatLng ne = 1;
+	LatLng sw = 2;
+}
+
+message MapRequest {
+	LatLngBounds bounds = 1;
+}
+
+message MapResponse {
+
+}
+
+message Empty {}
+
+message ID {
+	int64 id = 1;
+}
+
+message IDQuery {
+	int64 id = 1;
+	int32 offset = 2;
+}
+
+message StringID {
+	string id = 1;
+}
+
+message StringIDQuery {
+	string id = 1;
+	int32 offset = 2;
+}
+
+enum Gender {
+	NONE = 0;
+	FEMALE = 1;
+	MALE = 2;
+}
+
+message User {
+	int64 id = 1;
+	string name = 2;
+	string username = 3;
+	string bio = 4;
+	string photoURL = 5;
+	int64 posts = 6;
+	int64 followers = 7;
+	int64 following = 8;
+}
+
+message Users {
+	repeated User users = 1;
+}
+
+message UserProfile {
+
+}
+
+message UserProfileRequest {
+	bytes photo = 1;
+	string photoURL = 2;
+	string name = 3;
+	string username = 4;
+	string bio = 5;
+	Gender gender = 6;
+	int64 birthday = 7;
+}
+
+message UserProfileResponse {
+	string photoURL = 1;
+}
+
+message Following {
+	repeated User users = 1;
+	repeated Space spaces = 2;
+	repeated Tag tags = 3;
+}
+
+message Place {
+	string name = 1;
+	string street = 2;
+	string city = 3;
+	string state = 4;
+	string country = 5;
+	enum Type {
+		PLACE = 0;
+		ADDRESS = 1;
+		CITY = 2;
+		STATE = 3;
+		COUNTRY = 4;
+	}
+	Type type = 6;
+	LatLng latLng = 7;
+}
+
+message SpaceNewRequest {
+	bytes photo = 1;
+	string name = 2;
+	string password = 3;
+	string bio = 4;
+	Place place = 5;
+	Gender gender = 6;
+	int32 ageMin = 7;
+	int32 ageMax = 8;
+}
+
+message SpaceNewResponse {
+	int64 id = 1;
+}
+
+message Space {
+	int64 id = 1;
+	string name = 2;
+	string photoURL = 3;
+	string bio = 4;
+	uint64 posts = 5;
+	uint64 followers = 6;
+}
+
+message Spaces {
+	repeated Space spaces = 1;
+}
+
+message PostNewRequest {
+	string name = 1;
+	message Content {
+		enum Type {
+			PHOTO = 0;
+			VIDEO = 1;
+		}
+		Type type = 1;
+		bytes content = 2;
+	}
+	repeated Content photos = 2;
+	string websiteURL = 3;
+	bool nameHidden = 4;
+	Space space = 5;
+	int64 expires = 6;
+}
+
+message PostNewResponse {
+	int64 id = 1;
+	string URLs = 2;
+}
+
+message Post {
+	int64 id = 1;
+	int64 userID = 2;
+	string name = 3;
+	string URLs = 4;
+	bool nameHidden = 5;
+	int64 spaceID = 6;
+	int64 upvotes = 7;
+	int64 downvotes = 8;
+	int64 created = 9;
+	int64 deleted = 10;
+	float rating = 11;
+	int64 startDate = 12;
+	int64 endDate = 13;
+	int32 price = 14;
+}
+
+message Posts {
+	repeated Post posts = 1;
+}
+
+message CommentNewRequest {
+	int64 postID = 1;
+	int64 replyID = 2;
+	string text = 3;
+}
+
+message CommentNewResponse {
+	int64 id = 1;
+}
+
+message Comment {
+	int64 id = 1;
+	int64 userID = 2;
+	int64 replyID = 3;
+	string text = 4;
+	int64 upvote = 5;
+	int64 downvote = 6;
+	int64 created = 7;
+}
+
+message Comments {
+	repeated Comment comments = 1;
+}
+
+message Tag {
+	string tag = 1;
+	int64 posts = 2;
+	int64 followers = 3;
+}
+
+message Tags {
+	repeated Tag tags = 1;
+}
+
+message Query {
+	string query = 1;
+}
+
+service Spark {
+	rpc Home(HomeRequest) returns (HomeResponse);
+	rpc Map(MapRequest) returns (MapResponse);
+	rpc UserProfileGet(Empty) returns (UserProfile);
+	rpc UserProfileEdit(UserProfileRequest) returns (UserProfileResponse);
+
+	rpc UserGet(ID) returns (User);
+	rpc UserFollowers(IDQuery) returns (Users);
+	rpc UserFollowing(IDQuery) returns (Following);
+	rpc UserPosts(IDQuery) returns (Posts);
+	rpc UserSpaces(IDQuery) returns (Spaces);
+
+	rpc SpaceNew(SpaceNewRequest) returns (SpaceNewResponse);
+	rpc SpaceGet(ID) returns (Space);
+	rpc SpacePosts(IDQuery) returns (Posts);
+	rpc SpaceSpaces(IDQuery) returns (Spaces);
+
+	rpc TagGet(StringID) returns (Tag);
+	rpc TagPosts(StringIDQuery) returns (Posts);
+
+	rpc PostNew(PostNewRequest) returns (PostNewResponse);
+	rpc PostGet(ID) returns (Post);
+	rpc PostUpvote(ID) returns (Empty);
+	rpc PostUnUpvote(ID) returns (Empty);
+	rpc PostDownvote(ID) returns (Empty);
+	rpc PostUnDownvote(ID) returns (Empty);
+
+	rpc PostComments(IDQuery) returns (Comments);
+	rpc CommentNew(CommentNewRequest) returns (CommentNewResponse);
+	rpc CommentUpvote(ID) returns (Empty);
+	rpc CommentUnUpvote(ID) returns (Empty);
+	rpc CommentDownvote(ID) returns (Empty);
+	rpc CommentUnDownvote(ID) returns (Empty);
+
+	rpc PostSearch(Query) returns (Posts);
+	rpc UserSearch(Query) returns (Users);
+	rpc TagSearch(Query) returns (Tags);
+	rpc SpaceSearch(Query) returns (Spaces);
+}
