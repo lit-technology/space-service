@@ -1,7 +1,7 @@
 module github.com/philip-bui/space-service
 
 require (
-	github.com/aws/aws-sdk-go v1.19.15
+	github.com/aws/aws-sdk-go v1.35.11
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/golang/geo v0.0.0-20181008215305-476085157cff
 	github.com/golang/protobuf v1.3.1
